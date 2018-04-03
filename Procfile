@@ -1,2 +1,1 @@
-release: echo "NULL"
-web: gunicorn erailseva.wsgi --log-file -
+web: gunicorn digimarketing.wsgi --log-file -

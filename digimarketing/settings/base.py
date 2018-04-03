@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 # Quick-start development settings - unsuitable for production
@@ -71,21 +71,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'digimarketing.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2', # DO NOT MODIFY ENGINE
-        'NAME': 'postgres', # DATABASE NAME
-        'USER': 'avinash', # USERNAME  
-        'PASSWORD': 'postgres', # PASSWORD
-        'HOST': 'localhost',    # HOST
-        'PORT': '5432',     # PORT
-    }
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
