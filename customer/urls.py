@@ -14,4 +14,5 @@ urlpatterns = [
 	url(r'^completed_orders/$', views.get_completed_orders),
 	url(r'^cancelorder/$', views.cancel_order),
 	url(r'^getorderstatus/$', views.get_order_status),
+	url(r'^getprofile/$', views.get_profile),
 ]

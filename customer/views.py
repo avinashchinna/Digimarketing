@@ -292,3 +292,19 @@ def cancel_order(request):
 
 	else:
 		return JsonResponse({"status": False})
+
+
+@csrf_exempt
+def get_profile(request):
+
+	try:
+		resp = {"status": True}
+		customer = Customer.objects.get(user_id = request.user.id)
+		resp["email"] = customer.user.email
+		resp["name"] = customer.user.first_name
+		resp["username"] = customer.user.username
+		resp["mobile"] = customer.mobile
+		resp["address"] = customer.address
+		return JsonResponse(resp)
+	except:
+		return JsonResponse({"status": False})
