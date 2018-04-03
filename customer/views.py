@@ -11,8 +11,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.utils import timezone
-from customer.models import Customer, Order
-from product.models import Product, Brand
+from customer.models import *
+from product.models import *
 
 from dbHandler import *
 # Create your views here.
@@ -203,13 +203,13 @@ def place_order(request):
 
 
 @csrf_exempt
-def get_all_orders(request):
+def get_ongoing_orders(request):
 
 	try:
 		resp = {"status": True}
 		resp["ongoing_orders"] = []
 		resp["completed_orders"] = []
-		orders = Order.objects.all().filter(customer = request.user.id).order_by('-time_stamp')
+		orders = Order.objects.all().filter(customer = request.user.id, status__in = ['0', '1', '2']).order_by('-time_stamp')
 		for order in orders:
 			odict = {
 				"order_id": order.order_id,
@@ -223,14 +223,37 @@ def get_all_orders(request):
 			}
 			if((timezone.now() - order.time_stamp).total_seconds() < 3600):
 				odict["showcb"] = True
-			if order.status in [Order.STATUS_DELIVERED, Order.STATUS_CANCELLED, Order.STATUS_CANCELLED_BY_VENDOR]:
-				resp["completed_orders"].append(odict)
-			else:
-				resp["ongoing_orders"].append(odict)
+			
+			resp["ongoing_orders"].append(odict)
 		return JsonResponse(resp)
 	except:
 		return JsonResponse({"status": False})
 
+
+@csrf_exempt
+def get_completed_orders(request):
+
+	try:
+		resp = {"status": True}
+		resp["ongoing_orders"] = []
+		resp["completed_orders"] = []
+		orders = Order.objects.all().filter(customer = request.user.id, status__in = ['3', '4', '5']).order_by('-time_stamp')
+		for order in orders:
+			odict = {
+				"order_id": order.order_id,
+				"brand" : order.item.product.brand.brand_name,
+				"product" : order.item.product.product_name,
+				"item_name": order.item.item_name,
+				"order_cost": order.order_cost,
+				"quantity": order.quantity,
+				"order_status" : order.get_status_display(),
+			}
+			
+			resp["completed_orders"].append(odict)
+			
+		return JsonResponse(resp)
+	except:
+		return JsonResponse({"status": False})
 
 
 @csrf_exempt
