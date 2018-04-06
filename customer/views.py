@@ -8,7 +8,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.models import User
 from django.utils import timezone
 from customer.models import *
@@ -67,6 +67,51 @@ def register(request):
 			return JsonResponse({"status": True, "msg": "Registered Successfully"})
 		except:
 			return JsonResponse({"status": False})
+
+	if request.method == 'GET':
+		pass
+
+
+@csrf_exempt
+def edit_profile(request):
+
+	if request.method == 'POST':
+		try:
+			reqdata = json.loads(request.body.decode("utf-8"))
+			if not reqdata['username']:
+				return JsonResponse({"status": False, "msg": "Username shouldn't be empty"})
+			if not reqdata['address']:
+				return JsonResponse({"status": False, "msg": "Address cannot be empty"})
+			
+			# user = User.objects.get(username = reqdata['username'])
+
+			if reqdata['password_change']:
+				if not reqdata['password']:
+					return JsonResponse({"status": False, "msg": "Password cannot be empty"})
+				if not request.user.check_password(reqdata['prev_password']):
+					return JsonResponse({"status": False, "msg": "Current password is incorrect"})
+				request.user.set_password(reqdata['password'])
+				update_session_auth_hash(request, request.user)
+
+			request.user.first_name = reqdata['cust_name']
+			request.user.email = reqdata['email']
+			try:
+				request.user.save()
+			except:
+				return JsonResponse({"status": False, "msg": "Internal Server Error 1"})
+
+			customer = Customer.objects.get(user = request.user.id)
+			customer.mobile = reqdata['mobile']
+			customer.address = reqdata['address']
+
+			try:
+				customer.save()
+			except:
+				return JsonResponse({"status": False, "msg": "Internal Server Error 2"})
+
+			return JsonResponse({"status": True, "msg": "Profile saved"})
+		except:
+			return JsonResponse({"status": False, "msg": "Internal Server Error 3"})
 
 	if request.method == 'GET':
 		pass
